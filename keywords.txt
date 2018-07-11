@@ -1,0 +1,9 @@
+eeprom_93C46	KEYWORD1
+ew_disable	KEYWORD2
+ew_enable	KEYWORD2
+is_ew_enabled	KEYWORD2
+erase_all	KEYWORD2
+write_all	KEYWORD2
+write	KEYWORD2
+erase	KEYWORD2
+read	KEYWORD2
