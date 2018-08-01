@@ -11,6 +11,7 @@
 class eeprom_93C46 {
   public:
   	eeprom_93C46(int pCS, int pSK, int pDI, int pDO);
+    void set_mode(bool longMode);
   	void ew_disable();
   	void ew_enable();
   	bool is_ew_enabled();
@@ -18,7 +19,7 @@ class eeprom_93C46 {
   	void write_all(word value);
   	void write(byte addr, word value);
   	void erase(byte addr);
-	word read(byte addr);
+    word read(byte addr);
   private:
   	void send_bits(word value, int len);
   	void wait();
@@ -27,6 +28,7 @@ class eeprom_93C46 {
   	int _pDI;
   	int _pDO;
   	bool _ew;
+    bool _mode;
 };
 
 #endif

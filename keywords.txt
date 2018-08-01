@@ -1,4 +1,5 @@
 eeprom_93C46	KEYWORD1
+set_mode	KEYWORD2
 ew_disable	KEYWORD2
 ew_enable	KEYWORD2
 is_ew_enabled	KEYWORD2

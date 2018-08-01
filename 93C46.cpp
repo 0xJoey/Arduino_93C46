@@ -29,7 +29,12 @@ eeprom_93C46::eeprom_93C46(int pCS, int pSK, int pDI, int pDO) {
 	_pDI = pDI;
 	_pDO = pDO;
 	_ew = false;
+	_mode = true;
 };
+
+void eeprom_93C46::set_mode(bool longMode) {
+	_mode = longMode;
+}
 
 void eeprom_93C46::ew_enable() {
 	digitalWrite(_pCS, HIGH);
@@ -53,6 +58,9 @@ bool eeprom_93C46::is_ew_enabled() {
 }
 
 void eeprom_93C46::erase_all() {
+	if(!this->is_ew_enabled()) {
+		return;
+	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
 	send_bits(CONTROL | ERASE_ALL, 2);
@@ -61,12 +69,78 @@ void eeprom_93C46::erase_all() {
 }
 
 void eeprom_93C46::write_all(word value) {
+	if(!this->is_ew_enabled()) {
+		return;
+	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
 	send_bits(CONTROL | WRITE_ALL, 2);
-	send_bits(value, 16);
+	if(_mode) {
+		send_bits(0xFFFF & value, 16);
+	} else {
+		send_bits(0xFF & value, 8);
+	}
 	digitalWrite(_pCS, LOW);
 	wait();
+}
+
+void eeprom_93C46::write(byte addr, word value) {
+	if(!this->is_ew_enabled()) {
+		return;
+	}
+	digitalWrite(_pCS, HIGH);
+	send_bits(HIGH, 1);
+	if(_mode) {
+		send_bits(WRITE | (addr & 0x3F), 8);
+		send_bits(0xFFFF & value, 16);
+	} else {
+		send_bits(WRITE<<1 | (addr & 0x7F), 9);
+		send_bits(0xFF & value, 8);
+	}
+	digitalWrite(_pCS, LOW);
+	wait();
+}
+
+void eeprom_93C46::erase(byte addr) {
+	if(!this->is_ew_enabled()) {
+		return;
+	}
+	digitalWrite(_pCS, HIGH);
+	send_bits(HIGH, 1);
+	if(_mode) {
+		send_bits(ERASE | (addr & 0x3F), 8);
+	} else {
+		send_bits(ERASE<<1 | (addr & 0x7F), 9);
+	}
+	
+	digitalWrite(_pCS, LOW);
+	wait();
+}
+
+word eeprom_93C46::read(byte addr) {
+	word val = 0;
+	digitalWrite(_pCS, HIGH);
+	send_bits(HIGH, 1);
+	
+	int amtBits;
+	if(_mode) {
+		send_bits(READ | (addr & 0x3F), 8);
+		amtBits = 16;
+	} else {
+		send_bits(READ<<1 | (addr & 0x7F), 9);
+		amtBits = 8;
+	}
+	// Read bits
+	for(int i = amtBits; i>0; i--) {
+		delayMicroseconds(1);
+		digitalWrite(_pSK, HIGH);
+		delayMicroseconds(1);
+		byte in = digitalRead(_pDO) ? 1 : 0;
+		digitalWrite(_pSK, LOW);
+		val |= (in << (i-1));
+	}
+	digitalWrite(_pCS, LOW);
+	return val;
 }
 
 void eeprom_93C46::send_bits(word value, int len) {
@@ -81,41 +155,6 @@ void eeprom_93C46::send_bits(word value, int len) {
 		digitalWrite(_pSK, LOW);
 		digitalWrite(_pDI, LOW);
 	}
-}
-
-void eeprom_93C46::write(byte addr, word value) {
-	digitalWrite(_pCS, HIGH);
-	send_bits(HIGH, 1);
-	send_bits(WRITE | (addr & 0x3F), 8);
-	send_bits(value,16);
-	digitalWrite(_pCS, LOW);
-	wait();
-}
-
-void eeprom_93C46::erase(byte addr) {
-	digitalWrite(_pCS, HIGH);
-	send_bits(HIGH, 1);
-	send_bits(ERASE | (addr & 0x3F), 8);
-	digitalWrite(_pCS, LOW);
-	wait();
-}
-
-word eeprom_93C46::read(byte addr) {
-	word val = 0;
-	digitalWrite(_pCS, HIGH);
-	send_bits(HIGH, 1);
-	send_bits(READ | (addr & 0x3F), 8);
-	// Read bits
-	for(int i = 15; i>=0; i--) {
-		delayMicroseconds(1);
-		digitalWrite(_pSK, HIGH);
-		delayMicroseconds(1);
-		byte in = digitalRead(_pDO) ? 1 : 0;
-		digitalWrite(_pSK, LOW);
-		val |= (in << i);
-	}
-	digitalWrite(_pCS, LOW);
-	return val;
 }
 
 void eeprom_93C46::wait() {
