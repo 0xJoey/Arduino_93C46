@@ -7,8 +7,7 @@
 #include "93C46.h"
 
 enum OP { // Operations
-	CONTROL		= 0x00, 
-	WRITE 		= 0x40, 
+	WRITE 		= 0x40,
 	READ 		= 0x80, 
 	ERASE 		= 0xC0
 };
@@ -39,11 +38,11 @@ void eeprom_93C46::set_mode(bool longMode) {
 void eeprom_93C46::ew_enable() {
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-		if(_mode) {
-			send_bits(EW_ENABLE, 8);
-		} else {
-			send_bits(EW_ENABLE<<1, 9);
-		}
+	if(_mode == EEPROM_93C46_MODE_16BIT) {
+		send_bits(EW_ENABLE, 8);
+	} else {
+		send_bits(EW_ENABLE<<1, 9);
+	}
 	digitalWrite(_pCS, LOW);
 	_ew = true;
 };
@@ -51,7 +50,7 @@ void eeprom_93C46::ew_enable() {
 void eeprom_93C46::ew_disable() {
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	if(_mode) {
+	if(_mode == EEPROM_93C46_MODE_16BIT) {
 		send_bits(EW_DISABLE, 8);
 	} else {
 		send_bits(EW_DISABLE<<1, 9);
@@ -70,7 +69,7 @@ void eeprom_93C46::erase_all() {
 	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	if(_mode) {
+	if(_mode == EEPROM_93C46_MODE_16BIT) {
 		send_bits(ERASE_ALL, 8);
 	} else {
 		send_bits(ERASE_ALL<<1, 9);
@@ -85,7 +84,7 @@ void eeprom_93C46::write_all(word value) {
 	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	if(_mode) {
+	if(_mode == EEPROM_93C46_MODE_16BIT) {
 		send_bits(WRITE_ALL, 8);
 		send_bits(0xFFFF & value, 16);
 	} else {
@@ -102,7 +101,7 @@ void eeprom_93C46::write(byte addr, word value) {
 	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	if(_mode) {
+	if(_mode == EEPROM_93C46_MODE_16BIT) {
 		send_bits(WRITE | (addr & 0x3F), 8);
 		send_bits(0xFFFF & value, 16);
 	} else {
@@ -119,7 +118,7 @@ void eeprom_93C46::erase(byte addr) {
 	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	if(_mode) {
+	if(_mode == EEPROM_93C46_MODE_16BIT) {
 		send_bits(ERASE | (addr & 0x3F), 8);
 	} else {
 		send_bits(ERASE<<1 | (addr & 0x7F), 9);
@@ -135,7 +134,7 @@ word eeprom_93C46::read(byte addr) {
 	send_bits(HIGH, 1);
 	
 	int amtBits;
-	if(_mode) {
+	if(_mode == EEPROM_93C46_MODE_16BIT) {
 		send_bits(READ | (addr & 0x3F), 8);
 		amtBits = 16;
 	} else {

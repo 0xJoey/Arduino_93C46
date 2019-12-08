@@ -1,15 +1,17 @@
 #include <93C46.h>
 /*
- * Example Sketch demonstration on how to write to a 93C46 eeprom
+ * Example Sketch demonstration on how to write to (and read from) a 93C46 eeprom
  * 
  * Wiring:
  * Pin 7(CS) to Chip pin 1
  * Pin 9(CS) to Chip pin 2
  * Pin 10(DI/MOSI) to Chip pin 3
  * Pin 11(DO/MISO) to Chip pin 4
- * GND to Chip pin 5
- * (For some chips:) GND/5V to pin 6 (This determines the organization, 5V is 16-bit, GND is 8-bit)
- * 5V to Chip pin 8
+ * 
+ * (For some chips:) GND/VCC to Chip pin 6
+ * This determines the organization:
+ * HIGH is 64x16 (Use EEPROM_MODE_16BIT)
+ * LOW is 128x8 (Use EEPROM_MODE_8BIT)
  * 
  */
 #define pCS 7
@@ -34,7 +36,7 @@ void debugPrint(word* buff, int len) {
 }
 
 void setup() {
-  bool longMode = true; // Change this to 'false' to use the 8-bit mode
+  bool longMode = EEPROM_93C46_MODE_16BIT;
   
   eeprom_93C46 e = eeprom_93C46(pCS, pSK, pDI, pDO);
   e.set_mode(longMode);
@@ -69,7 +71,6 @@ void setup() {
   }
   debugPrint(readBuffer, len);
   Serial.println();
-  delay(500);
 }
 
 void loop() {}

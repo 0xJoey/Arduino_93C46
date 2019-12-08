@@ -17,7 +17,7 @@ When the chip is powered on, EW is disabled. This blocks are attempts to erase/w
 
 Some 93C46 chips support different organizations. If the ORG pin is pulled high, the chip with organize itself in 64 words of 16 bits, if ORG is pulled low, it will organize itself as 128 words of 8 bits. The mode the library uses can be changed with `set_mode`. The library starts with 16-bit mode by default.
 
-Data written into one orgnization may or may not be able to be read in the other organization. Your mileage may vary, have fun.
+Data written into one organization may or may not be able to be read in the other organization. Your mileage may vary, have fun.
 
 Using the mode not corresponding to the chip organization will result in undefined behaviour.
 

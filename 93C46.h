@@ -8,6 +8,9 @@
 
 #include "Arduino.h"
 
+#define EEPROM_93C46_MODE_8BIT 0
+#define EEPROM_93C46_MODE_16BIT 1
+
 class eeprom_93C46 {
   public:
   	eeprom_93C46(int pCS, int pSK, int pDI, int pDO);
