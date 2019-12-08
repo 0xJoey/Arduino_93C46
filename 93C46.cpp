@@ -39,16 +39,23 @@ void eeprom_93C46::set_mode(bool longMode) {
 void eeprom_93C46::ew_enable() {
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	send_bits(CONTROL | EW_ENABLE, 8);
+		if(_mode) {
+			send_bits(EW_ENABLE, 8);
+		} else {
+			send_bits(EW_ENABLE<<1, 9);
+		}
 	digitalWrite(_pCS, LOW);
 	_ew = true;
 };
 
-
 void eeprom_93C46::ew_disable() {
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	send_bits(CONTROL | EW_DISABLE, 8);
+	if(_mode) {
+		send_bits(EW_DISABLE, 8);
+	} else {
+		send_bits(EW_DISABLE<<1, 9);
+	}
 	digitalWrite(_pCS, LOW);
 	_ew = false;
 }
@@ -63,7 +70,11 @@ void eeprom_93C46::erase_all() {
 	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	send_bits(CONTROL | ERASE_ALL, 2);
+	if(_mode) {
+		send_bits(ERASE_ALL, 8);
+	} else {
+		send_bits(ERASE_ALL<<1, 9);
+	}
 	digitalWrite(_pCS, LOW);
 	wait();
 }
@@ -74,10 +85,11 @@ void eeprom_93C46::write_all(word value) {
 	}
 	digitalWrite(_pCS, HIGH);
 	send_bits(HIGH, 1);
-	send_bits(CONTROL | WRITE_ALL, 2);
 	if(_mode) {
+		send_bits(WRITE_ALL, 8);
 		send_bits(0xFFFF & value, 16);
 	} else {
+		send_bits(WRITE_ALL<<1, 9);
 		send_bits(0xFF & value, 8);
 	}
 	digitalWrite(_pCS, LOW);
@@ -162,7 +174,7 @@ void eeprom_93C46::wait() {
 	//Wait until action is done.
 	digitalWrite(_pCS, HIGH);
 	while(digitalRead(_pDO) != HIGH) {
-	delayMicroseconds(1);
+		delayMicroseconds(1);
 	}
 	digitalWrite(_pCS, LOW);
 }
