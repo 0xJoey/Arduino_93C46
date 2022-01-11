@@ -135,7 +135,8 @@ word eeprom_93C46::read(byte addr) {
 	
 	int amtBits;
 	if(_mode == EEPROM_93C46_MODE_16BIT) {
-		send_bits(READ | (addr & 0x3F), 8);
+		send_bits(READ >> 6, 2);
+		send_bits(addr, 8);
 		amtBits = 16;
 	} else {
 		send_bits(READ<<1 | (addr & 0x7F), 9);
