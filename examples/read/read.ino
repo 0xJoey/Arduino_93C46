@@ -4,7 +4,7 @@
  * 
  * Wiring:
  * Pin 7(CS) to Chip pin 1
- * Pin 9(CS) to Chip pin 2
+ * Pin 9(SCK) to Chip pin 2
  * Pin 10(DI/MOSI) to Chip pin 3
  * Pin 11(DO/MISO) to Chip pin 4
  * 

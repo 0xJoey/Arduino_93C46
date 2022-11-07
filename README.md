@@ -11,7 +11,7 @@ The 93C46 is a 1KB EEPROM communicating over 3-wire serial, with an additional C
 
 ## EW (Erase/Write)
 
-When the chip is powered on, EW is disabled. This blocks are attempts to erase/write anything on the chip. Once enabled, EW will stay enabled until it is explicitly disabled or the chip loses power.
+When the chip is powered on, EW is disabled. This blocks our attempts to erase/write anything on the chip. Once enabled, EW will stay enabled until it is explicitly disabled or the chip loses power.
 
 ## Organization
 
@@ -45,7 +45,7 @@ Using the mode not corresponding to the chip organization will result in undefin
  * 
  * Wiring:
  * Pin 7(CS) to Chip pin 1
- * Pin 9(CS) to Chip pin 2
+ * Pin 9(SCK) to Chip pin 2
  * Pin 10(DI/MOSI) to Chip pin 3
  * Pin 11(DO/MISO) to Chip pin 4
  * GND to Chip pin 5
