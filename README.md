@@ -38,7 +38,7 @@ Using the mode not corresponding to the chip organization will result in undefin
 
 # Example
 
-```
+```cpp
 #include <93C46.h>
 /*
  * Example Sketch demonstration on how to write to a 93C46 eeprom
